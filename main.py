@@ -1,3 +1,5 @@
+import os
+
 import frida
 
 from flask import Flask, jsonify, request
@@ -9,8 +11,9 @@ def on_message(message, data):
     else:
         print(message)
 
-
-js = open('test_02.js', 'r', encoding='utf8').read()
+basedir = os.path.dirname(__file__)
+upload_path = os.path.join(basedir, "test_01.js")
+js = open(upload_path, 'r', encoding='utf8').read()
 # session = frida.get_usb_device().attach('me.ele')
 session = frida.get_usb_device().attach('com.taobao.idlefish')
 script = session.create_script(js)
