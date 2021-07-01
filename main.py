@@ -1,50 +1,40 @@
-import frida, sys
+import frida
+
+from flask import Flask, jsonify, request
+
+
 def on_message(message, data):
     if message['type'] == 'send':
         print("[*] {0}".format(message['payload']))
     else:
         print(message)
 
-jscode = """
-Java.perform(function () {
-    function a(params) {
-        var keyset = params.keySet()
-        var it = keyset.iterator()
-        while(it.hasNext()){
-            var keystr = it.next().toString()
-            var valuestr
-            if (params.get(keystr) != null){
-                valuestr = params.get(keystr).toString()
-            } else{
-                valuestr = params.get(keystr)
-            }
-            console.log(keystr, valuestr)
-        }
-        console.log("*******************")
-    }
-    
-    var InnerSignImpl = Java.use("mtopsdk.security.InnerSignImpl")
-        InnerSignImpl.getUnifiedSign.implementation = function (params, ext, appKey, authCode, useWua, requestId) {
-            a(params)
-            a(ext)
-            console.log(appKey)
-            console.log(authCode)
-            console.log(useWua)
-            console.log(requestId)
-            var ret = this.getUnifiedSign(params, ext, appKey, authCode, useWua, "r_1")
-            console.log(ret.toString())
-            return ret
-        }
-    var SwitchConfig = Java.use('mtopsdk.mtop.global.SwitchConfig');
-    SwitchConfig.zJ.overload().implementation = function () {
-            return false;
-        }
-})
-"""
 
-process = frida.get_usb_device().attach('com.taobao.idlefish')
-script = process.create_script(jscode)
+js = open('test_02.js', 'r', encoding='utf8').read()
+# session = frida.get_usb_device().attach('me.ele')
+session = frida.get_usb_device().attach('com.taobao.idlefish')
+script = session.create_script(js)
 script.on('message', on_message)
-print('[*] Running CTF')
 script.load()
-sys.stdin.read()
+
+app = Flask(__name__)
+
+
+@app.route('/test')
+def hello_world():
+    args = request.args['url_path']
+    res = script.exports.callsecretfunctionedy(args)
+    return jsonify(res)
+
+
+@app.route('/result')
+def dy_test():
+    # url = request.args['url'] #
+    res = script.exports.callsecretfunctioneleme()
+    print(type(res))
+    result = {"status": 200, "data": res}
+    return result
+
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=8889, debug=True)
