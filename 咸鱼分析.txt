@@ -1,0 +1,22 @@
+getUnifiedSign这个函数生成四个参数：
+{
+x-sign=azU7Bc002xAAJlKwot8JAMOPvcxgJlK2UFh/AFUUqX5NkKKy55LhfU89EpH3HF++OaNscUks8n8htJbKAo8W0vPy8yZSplK2UqZStl, 
+x-mini-wua=HHnB_Lhwkt5ohLiRg5iAJ97JB3jJa9u99+1y5yFekIzRs1VMvUj1ktwfmZvL15RSjYZ3ftbywL3mUgiX3Y/VAo7kuyh6NwaED9WL/78iHJmY1TonAPV6qPlFG+iZ/yRhlygxrdAcD06zOOYXUZPuHVqL3Rg==, 
+x-sgext=JAH3JXRpYpo1lXKEq3SI3SXGFccWzwbCEs4V1BHGBtQUwRfCFcQUzxTD, 
+x-umt=8m8AS1JLPLHYtAJ6WqDQhrFT7HG5qgyX}
+
+x-sign
+x-mini-wua
+x-sgext
+x-umt
+上面四个暂时算生成，需找下面四个
+
+
+
+mtopsdk.mtop.protocol.builder.impl.InnerProtocolParamBuilderImpl
+CLIENT_TRACE_ID：x-c-traceid = utdid + "16253027768630026113943"(不知道是什么)
+
+X_UTDID：x-utdid = utdid
+X_UMID_TOKEN：x-umt(url编码了) = umid
+X_DEVID：x-devid = deviceId
+
