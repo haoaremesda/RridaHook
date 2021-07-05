@@ -15,8 +15,11 @@ x-umt
 
 mtopsdk.mtop.protocol.builder.impl.InnerProtocolParamBuilderImpl
 CLIENT_TRACE_ID：x-c-traceid = utdid + "16253027768630026113943"(不知道是什么)
-
 X_UTDID：x-utdid = utdid
+
 X_UMID_TOKEN：x-umt(url编码了) = umid
+
 X_DEVID：x-devid = deviceId
+
+com.loc.dc.c就是写入x-utdid
 
