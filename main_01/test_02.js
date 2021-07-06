@@ -44,6 +44,13 @@ function callEleMeFun() { //定义导出函数
     return result
 }
 
+Java.perform(function () {
+    var SwitchConfig = Java.use('mtopsdk.mtop.global.SwitchConfig');
+        SwitchConfig.zJ.overload().implementation = function () {
+            return false;
+        }
+});
+
 function callDYFun(url) { //定义导出函数
     Java.perform(function () {
         var ss = Java.use('com.ss.sys.ces.gg.tt$1');
@@ -55,6 +62,7 @@ function callDYFun(url) { //定义导出函数
     });
     return result;
 }
+
 
 rpc.exports = {
     callsecretfunctioneleme: callEleMeFun,

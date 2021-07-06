@@ -9,17 +9,21 @@ x-sign
 x-mini-wua
 x-sgext
 x-umt
-上面四个暂时算生成，需找下面四个
+上面四个暂时算生成，需找下面四个，这四个多次请求情况下不会发生改变，除非卸载过一次
 
+来源：mtopsdk.framework.filter.duplex.AppConfigDuplexFilter.doBefore
+CLIENT_TRACE_ID：x-c-traceid = (utdid|x-utdid) + "YOPMinKmz8YDAE%2B59R0ng548 1625541856 2840026 1 6218"(不知道是什么，会变化)
+x-c-traceid = x-utdid + x-t(10位时间戳) + (未知，但是测试可以随机，暂定7位) + ”1“ + pid进程号
+YNq63rgMqdIDAIsQ6dch9NzI 1625032693 8830025 1 7263
 
-
-mtopsdk.mtop.protocol.builder.impl.InnerProtocolParamBuilderImpl
-CLIENT_TRACE_ID：x-c-traceid = utdid + "16253027768630026113943"(不知道是什么)
+来源：com.ta.utdid2.device.UTUtdid.getValueForUpdate
 X_UTDID：x-utdid = utdid
+getValueForUpdate就是获取x-utdid：如果本地数据库没有这个属性，则通过generateUtdid获取字节数组base64编码。
+com.loc.dc.c，generateUtdid()字节数组，转base64即可。获取imei。
+com.ta.utdid2.android.utils.PhoneInfoUtils获取设备属性imei、imsi
 
 X_UMID_TOKEN：x-umt(url编码了) = umid
 
 X_DEVID：x-devid = deviceId
 
-com.loc.dc.c就是写入x-utdid
 

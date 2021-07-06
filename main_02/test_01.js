@@ -31,8 +31,8 @@ function ttsz() {
         //     console.log("*******************")
         //     return ret
         // }
-        var current_application = Java.use('android.app.ActivityThread').currentApplication();
-        var context = current_application.getApplicationContext();
+        // var current_application = Java.use('android.app.ActivityThread').currentApplication();
+        // var context = current_application.getApplicationContext();
         // // console.log(context)
         // var WVWebPushService = Java.use("android.taobao.windvane.extra.uc.WVWebPushService")
         // console.log(WVWebPushService)
@@ -40,23 +40,27 @@ function ttsz() {
         // for (var i in methods) {
         //     console.log(methods[i].toString());
         // }
+        var DeviceSecuritySDK = Java.use("com.taobao.dp.DeviceSecuritySDK")
 
-        var UTUtdid = Java.use("com.ta.utdid2.device.UTUtdid")
-        var Base64 = Java.use("com.ta.utdid2.android.utils.Base64")
-        var sess = Java.use("android.provider.Settings")
-        var utut = UTUtdid.instance(context)
-        var res = utut.readUtdid()
+        DeviceSecuritySDK.getSecurityToken.overload().implementation = function () {
+            showStacks()
+            var current_application = Java.use('android.app.ActivityThread').currentApplication();
+            var context = current_application.getApplicationContext();
+            var res = this.getSecurityToken()
+            console.log(res)
+            return res;
+        }
+
+        // var devi = DeviceSecuritySDK.$new(context)
+        // var res = devi.getSecurityToken()
+        // console.log("sadsadad", res)
+        // var utut = UTUtdid.instance(context)
+        // var res = utut.readUtdid()
         // var dit = sess.System.getString(context, "mqBRboGZkQPcAkyk")
         // var res = utut.generateUtdid()
         // console.log(gson.toJson(res))
         // console.log(Base64.encodeToString(res, 2))
-        console.log(res)
-        console.log(sess)
-        var methods = sess.class.getDeclaredMethods();
-        for (var i in methods) {
-            console.log(methods[i].toString());
-        }
-        return res
+        // console.log(res)
 
         // var wvws = WVWebPushService.getInstance(context)
         // console.log(wvws)
@@ -90,7 +94,7 @@ function hook_all() {
     });
 }
 
-function main(){
+function main() {
     ttsz()
 }
 
