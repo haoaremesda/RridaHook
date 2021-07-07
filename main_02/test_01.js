@@ -23,14 +23,29 @@ function ttsz() {
         //     return ret
         // }
 
-        // var InnerSignImpl = Java.use("mtopsdk.security.InnerSignImpl")
-        // InnerSignImpl.getUnifiedSign.implementation = function (params, ext, appKey, authCode, useWua, requestId) {
+        // var ConfigStoreManager = Java.use("mtopsdk.common.util.ConfigStoreManager")
+        // ConfigStoreManager.saveConfigItem.implementation = function (context, store, keyPrefix, key, value) {
         //     showStacks()
-        //     var ret = this.getUnifiedSign(params, ext, appKey, authCode, useWua, requestId)
-        //     console.log("params", gson.toJson(ret))
+        //     var ret = this.saveConfigItem(context, store, keyPrefix, key, value)
+        //     console.log(store, keyPrefix, key, value)
+        //     console.log("saveConfigItem boolean", ret)
         //     console.log("*******************")
         //     return ret
         // }
+
+        var InnerSignImpl = Java.use("mtopsdk.security.InnerSignImpl")
+        InnerSignImpl.getUnifiedSign.implementation = function (params, ext, appKey, authCode, useWua, requestId) {
+            showStacks()
+            // var DataReportJniBridge = Java.use("com.taobao.wireless.security.adapter.datareport.DataReportJniBridge")
+            // console.log(DataReportJniBridge)
+            console.log("params", gson.toJson(params))
+            console.log("ext", gson.toJson(ext))
+            console.log(appKey, authCode, useWua, requestId)
+            var ret = this.getUnifiedSign(params, ext, appKey, authCode, useWua, requestId)
+            console.log(gson.toJson(ret))
+            console.log("*******************")
+            return ret
+        }
         // var current_application = Java.use('android.app.ActivityThread').currentApplication();
         // var context = current_application.getApplicationContext();
         // // console.log(context)
@@ -40,16 +55,16 @@ function ttsz() {
         // for (var i in methods) {
         //     console.log(methods[i].toString());
         // }
-        var DeviceSecuritySDK = Java.use("com.taobao.dp.DeviceSecuritySDK")
-
-        DeviceSecuritySDK.getSecurityToken.overload().implementation = function () {
-            showStacks()
-            var current_application = Java.use('android.app.ActivityThread').currentApplication();
-            var context = current_application.getApplicationContext();
-            var res = this.getSecurityToken()
-            console.log(res)
-            return res;
-        }
+        // var DeviceSecuritySDK = Java.use("com.taobao.dp.DeviceSecuritySDK")
+        //
+        // DeviceSecuritySDK.getSecurityToken.overload().implementation = function () {
+        //     showStacks()
+        //     var current_application = Java.use('android.app.ActivityThread').currentApplication();
+        //     var context = current_application.getApplicationContext();
+        //     var res = this.getSecurityToken()
+        //     console.log(res)
+        //     return res;
+        // }
 
         // var devi = DeviceSecuritySDK.$new(context)
         // var res = devi.getSecurityToken()

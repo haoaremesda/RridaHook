@@ -1,4 +1,4 @@
-getUnifiedSign这个函数生成四个参数：
+mtopsdk.security.InnerSignImpl.getUnifiedSign这个函数生成四个参数：
 {
 x-sign=azU7Bc002xAAJlKwot8JAMOPvcxgJlK2UFh/AFUUqX5NkKKy55LhfU89EpH3HF++OaNscUks8n8htJbKAo8W0vPy8yZSplK2UqZStl, 
 x-mini-wua=HHnB_Lhwkt5ohLiRg5iAJ97JB3jJa9u99+1y5yFekIzRs1VMvUj1ktwfmZvL15RSjYZ3ftbywL3mUgiX3Y/VAo7kuyh6NwaED9WL/78iHJmY1TonAPV6qPlFG+iZ/yRhlygxrdAcD06zOOYXUZPuHVqL3Rg==, 
@@ -9,11 +9,18 @@ x-sign
 x-mini-wua
 x-sgext
 x-umt
-上面四个暂时算生成，需找下面四个，这四个多次请求情况下不会发生改变，除非卸载过一次
+objection是一个基于Frida开发的命令行工具，它可以很方便的Hook Java函数和类，并输出参数，调用栈，返回值。
+pip install objection
+https://www.bilibili.com/read/cv7918676/
+以上四个参数来自getSecurityFactors函数，来自IUnifiedSecurityComponent接口，但实现类未找到。考虑内存中查找来源
+HashMap<String, String> output = this.f5748a.getSecurityFactors(input);
+
+
+上面四个暂时算生成，需找下面三个，这三个多次请求情况下不会发生改变，除非卸载过一次
 
 来源：mtopsdk.framework.filter.duplex.AppConfigDuplexFilter.doBefore
-CLIENT_TRACE_ID：x-c-traceid = (utdid|x-utdid) + "YOPMinKmz8YDAE%2B59R0ng548 1625541856 2840026 1 6218"(不知道是什么，会变化)
 x-c-traceid = x-utdid + x-t(10位时间戳) + (未知，但是测试可以随机，暂定7位) + ”1“ + pid进程号
+CLIENT_TRACE_ID：x-c-traceid = (utdid|x-utdid) + "YOPMinKmz8YDAE%2B59R0ng548 1625541856 2840026 1 6218"(不知道是什么，会变化)
 YNq63rgMqdIDAIsQ6dch9NzI 1625032693 8830025 1 7263
 
 来源：com.ta.utdid2.device.UTUtdid.getValueForUpdate
@@ -22,8 +29,26 @@ getValueForUpdate就是获取x-utdid：如果本地数据库没有这个属性�
 com.loc.dc.c，generateUtdid()字节数组，转base64即可。获取imei。
 com.ta.utdid2.android.utils.PhoneInfoUtils获取设备属性imei、imsi
 
-X_UMID_TOKEN：x-umt(url编码了) = umid
-
+来源：https://acs.m.taobao.com/gw/mtop.sys.newdeviceid/4.0/?data=%7B%22c1%22%3A%22oneplus+a5000%22%2C%22c2%22%3A%22540000000260676%22%2C%22c0%22%3A%22Oneplus%22%2C%22device_global_id%22%3A%22YOPMinKmz8YDAE%2B59R0ng548540000000260676460021376059632%22%2C%22c6%22%3A%22e7985a0020c06129%22%2C%22c4%22%3A%22%22%2C%22new_device%22%3A%22true%22%2C%22c5%22%3A%22ZX1G42CPJD%22%2C%22c3%22%3A%22460021376059632%22%7D
+https://acs.m.taobao.com/gw/mtop.sys.newdeviceid/4.0/?data={"c1":"oneplus a5000","c2":"540000000260676","c0":"Oneplus","device_global_id":"YOPMinKmz8YDAE+59R0ng548540000000260676460021376059632","c6":"e7985a0020c06129","c4":"","new_device":"true","c5":"ZX1G42CPJD","c3":"460021376059632"}
+{
+device_global_id = x-utdid(utdid) + imei + imsi
+"YOPMinKmz8YDAE+59R0ng548 540000000260676 460021376059632"
+MtopSysNewDeviceIdRequest请求发出
+request.device_global_id = x-utdid(utdid) + imei + imsi;
+request.new_device = true;
+request.c0 = Build.BRAND 手机型号;
+request.c1 = Build.MODEL 手机品牌（注意大写）;
+request.c2 = imei 手机IMEI编码;
+request.c3 = imsi 手机INSI编码;
+request.c4 = "";
+request.c5 = PhoneInfo.getSerialNum() 手机的序列号 adb shell getprop ro.serialno;
+request.c6 = PhoneInfo.getAndroidId(context) 手机唯一ID adb shell settings get secure android_id;
+}
 X_DEVID：x-devid = deviceId
+
+这两个参数是登陆后返回的，一般来说固定即可
+x-sid: 16cd65b8f1c53f4bf23fab0749aadf18
+x-uid: 2276087233
 
 

@@ -12,7 +12,7 @@ def on_message(message, data):
         print(message)
 
 basedir = os.path.dirname(__file__)
-upload_path = os.path.join(basedir, "test_01.js")
+upload_path = os.path.join(basedir, "test_02.js")
 js = open(upload_path, 'r', encoding='utf8').read()
 # session = frida.get_usb_device().attach('me.ele')
 session = frida.get_usb_device().attach('com.taobao.idlefish')

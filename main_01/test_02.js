@@ -5,10 +5,6 @@ function callEleMeFun() { //定义导出函数
         Java.openClassFile("data/local/tmp/gson-2.8.5.dex").load()
         var Gson = Java.use("com.google.gson.Gson")
         var gson = Gson.$new()
-        var SwitchConfig = Java.use('mtopsdk.mtop.global.SwitchConfig');
-        SwitchConfig.zJ.overload().implementation = function () {
-            return false;
-        }
         var MtopConfig = Java.use('mtopsdk.mtop.global.MtopConfig');
         var mtop = MtopConfig.$new("INNER")
         console.log(mtop.toString())
