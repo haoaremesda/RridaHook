@@ -23,6 +23,26 @@ function ttsz() {
         //     return ret
         // }
 
+        var SecurityGuardManager = Java.use("com.alibaba.wireless.security.open.SecurityGuardManager")
+        SecurityGuardManager.a.implementation = function (i) {
+            showStacks()
+            var ret = this.a(i)
+            console.log("params", i)
+            console.log("ret", ret)
+            console.log("*******************")
+            return ret
+        }
+
+        var FlutterEnginePluginRegistry = Java.use("io.flutter.embedding.engine.FlutterEnginePluginRegistry")
+        FlutterEnginePluginRegistry.get.implementation = function (pluginClass) {
+            showStacks()
+            var ret = this.get(pluginClass)
+            console.log("Class", pluginClass)
+            console.log("params", ret)
+            console.log("*******************")
+            return ret
+        }
+
         // var ConfigStoreManager = Java.use("mtopsdk.common.util.ConfigStoreManager")
         // ConfigStoreManager.saveConfigItem.implementation = function (context, store, keyPrefix, key, value) {
         //     showStacks()
@@ -33,19 +53,19 @@ function ttsz() {
         //     return ret
         // }
 
-        var InnerSignImpl = Java.use("mtopsdk.security.InnerSignImpl")
-        InnerSignImpl.getUnifiedSign.implementation = function (params, ext, appKey, authCode, useWua, requestId) {
-            showStacks()
-            // var DataReportJniBridge = Java.use("com.taobao.wireless.security.adapter.datareport.DataReportJniBridge")
-            // console.log(DataReportJniBridge)
-            console.log("params", gson.toJson(params))
-            console.log("ext", gson.toJson(ext))
-            console.log(appKey, authCode, useWua, requestId)
-            var ret = this.getUnifiedSign(params, ext, appKey, authCode, useWua, requestId)
-            console.log(gson.toJson(ret))
-            console.log("*******************")
-            return ret
-        }
+        // var InnerSignImpl = Java.use("mtopsdk.security.InnerSignImpl")
+        // InnerSignImpl.getUnifiedSign.implementation = function (params, ext, appKey, authCode, useWua, requestId) {
+        //     showStacks()
+        //     // var DataReportJniBridge = Java.use("com.taobao.wireless.security.adapter.datareport.DataReportJniBridge")
+        //     // console.log(DataReportJniBridge)
+        //     console.log("params", gson.toJson(params))
+        //     console.log("ext", gson.toJson(ext))
+        //     console.log(appKey, authCode, useWua, requestId)
+        //     var ret = this.getUnifiedSign(params, ext, appKey, authCode, useWua, requestId)
+        //     console.log(gson.toJson(ret))
+        //     console.log("*******************")
+        //     return ret
+        // }
         // var current_application = Java.use('android.app.ActivityThread').currentApplication();
         // var context = current_application.getApplicationContext();
         // // console.log(context)

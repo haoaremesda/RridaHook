@@ -13,7 +13,10 @@ objection是一个基于Frida开发的命令行工具，它可以很方便的Hoo
 pip install objection
 https://www.bilibili.com/read/cv7918676/
 以上四个参数来自getSecurityFactors函数，来自IUnifiedSecurityComponent接口，但实现类未找到。考虑内存中查找来源
-HashMap<String, String> output = this.f5748a.getSecurityFactors(input);
+HashMap<String, String> output = this.f5748a.getSecurityFactors(input)
+com.alibaba.one.android.inner.DataReportJniBridge
+com.taobao.wireless.security.adapter.datareport.DataReportJniBridge
+
 
 
 上面四个暂时算生成，需找下面三个，这三个多次请求情况下不会发生改变，除非卸载过一次
@@ -50,5 +53,3 @@ X_DEVID：x-devid = deviceId
 这两个参数是登陆后返回的，一般来说固定即可
 x-sid: 16cd65b8f1c53f4bf23fab0749aadf18
 x-uid: 2276087233
-
-
