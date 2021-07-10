@@ -23,25 +23,25 @@ function ttsz() {
         //     return ret
         // }
 
-        var SecurityGuardManager = Java.use("com.alibaba.wireless.security.open.SecurityGuardManager")
-        SecurityGuardManager.a.implementation = function (i) {
-            showStacks()
-            var ret = this.a(i)
-            console.log("params", i)
-            console.log("ret", ret)
-            console.log("*******************")
-            return ret
-        }
-
-        var FlutterEnginePluginRegistry = Java.use("io.flutter.embedding.engine.FlutterEnginePluginRegistry")
-        FlutterEnginePluginRegistry.get.implementation = function (pluginClass) {
-            showStacks()
-            var ret = this.get(pluginClass)
-            console.log("Class", pluginClass)
-            console.log("params", ret)
-            console.log("*******************")
-            return ret
-        }
+        // var SecurityGuardManager = Java.use("com.alibaba.wireless.security.open.SecurityGuardManager")
+        // SecurityGuardManager.a.implementation = function (i) {
+        //     showStacks()
+        //     var ret = this.a(i)
+        //     console.log("params", i)
+        //     console.log("ret", ret)
+        //     console.log("*******************")
+        //     return ret
+        // }
+        //
+        // var FlutterEnginePluginRegistry = Java.use("io.flutter.embedding.engine.FlutterEnginePluginRegistry")
+        // FlutterEnginePluginRegistry.get.implementation = function (pluginClass) {
+        //     showStacks()
+        //     var ret = this.get(pluginClass)
+        //     console.log("Class", pluginClass)
+        //     console.log("params", ret)
+        //     console.log("*******************")
+        //     return ret
+        // }
 
         // var ConfigStoreManager = Java.use("mtopsdk.common.util.ConfigStoreManager")
         // ConfigStoreManager.saveConfigItem.implementation = function (context, store, keyPrefix, key, value) {
