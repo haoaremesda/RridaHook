@@ -3,3 +3,38 @@
 后面再刷分设备：
     模拟器需要休息5-10分钟再过验证码，感觉数据有点假。
     真机划过验证码就能继续刷，数据较真实。但是频率10次左右出验证码。
+
+mitmproxy
+
+
+driver.current_activity
+com.idlefish.flutterbridge.flutterboost.IdleFishFlutterActivity
+
+已折叠, 综合
+text = 已折叠, 区域
+text = 已折叠, 筛选
+text = 最新发布
+text = 价格降序
+
+.driver.find_element_by_xpath("//android.view.View[@text='搜索']")
+.driver.find_element_by_xpath("//*[@text='已折叠, 综合']|//*[@text='已折叠, 最新发布']").click()
+.driver.find_element_by_xpath("//*[@text='最新发布']").click()
+
+fullld = "nc_1_n1t"
+start_but = self.driver.find_element_by_xpath("//*[@id='nc_1_n1t']|//*[@resource-id='nc_1_n1t']")
+start_but_rect = start_but.rect
+
+text = "向右滑动验证"
+end_but = self.driver.find_element_by_xpath("//*[contains(@text,'向右滑动验证')]")
+end_but_rect = end_but.rect
+
+swipe_end = end_but_rect['x'] + end_but_rect['width']
+
+action = TouchAction(self.driver)
+action.press(start_but).perform().move_to(start_but, swipe_end, end_but_rect['y']).release().perform()
+action.press(start_but).perform().move_to(start_but, swipe_end/3, end_but_rect['y']).wait(5000).move_to(start_but, swipe_end/3*2, end_but_rect['y']).release().perform()
+
+self.driver.swipe(start_but_rect['x'] + random.uniform(10, start_but_rect['width']), start_but_rect['y'], swipe_end, end_but_rect['y'] + 10)
+
+self.driver.swipe(but.location['x'], but.location['y'], swipe_end, but.location['y'] + 10)
+self.driver.find_element_by_xpath("//android.view.View[contains(@text,'刷新')]")

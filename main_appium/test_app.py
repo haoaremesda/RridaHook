@@ -3,6 +3,9 @@ import time
 import traceback
 
 from appium import webdriver
+from appium.webdriver.common.touch_action import TouchAction
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 
 def testing(func):
@@ -20,15 +23,16 @@ class MyTests():
         self.url = "http://127.0.0.1:8889/wd/hub"
         self.desired_caps = {'platformName': 'Android',  # 平台名称
                              'platformVersion': '6.0.1',  # 系统版本号
-                             'deviceName': '127.0.0.1:7555',  # 设备名称。如果是真机，在'设置->关于手机->设备名称'里查看
-                             'appPackage': 'com.taobao.idlefish',  # apk的包名
-                             'appActivity': 'com.taobao.fleamarket.home.activity.InitActivity',  # activity 名称
-                             "noReset": "True",
+                             'deviceName': 'kkkkkkkkk',  # 设备名称。如果是真机，在'设置->关于手机->设备名称'里查看
+                             # 'appPackage': 'com.taobao.idlefish',  # apk的包名
+                             # 'appActivity': 'com.taobao.fleamarket.home.activity.InitActivity',  # activity 名称
+                             'noReset': "True",
                              'newCommandTimeout': 600,
                              'disableAndroidWatchers': True,
                              'skipDeviceInitialization': True,
-                             "unicodeKeyboard": True,
-                             "resetKeyboard": True
+                             'unicodeKeyboard': True,
+                             'resetKeyboard': True,
+                             'udid': 'f5c6c341'
                              }
         self.front_view_id = "com.taobao.idlefish:id/front_view"
         self.flutter_activity = "com.idlefish.flutterbridge.flutterboost.IdleFishFlutterActivity"
@@ -58,17 +62,18 @@ class MyTests():
                 # edit_text = self.driver.find_element_by_class_name("android.widget.EditText")
                 if self.is_element_exist('class="android.widget.EditText"'):
                     edit_text = self.driver.find_element_by_class_name("android.widget.EditText")
-                    while True:
-                        edit_text.clear()
-                        if ", " in edit_text.text:
-                            continue
-                        else:
-                            break
-                    edit_text.send_keys(word)
                     if word in edit_text.text:
                         self.driver.find_element_by_xpath(self.search_but_xpath).click()
                         self.driver.implicitly_wait(10)
                         return True
+                    else:
+                        while True:
+                            edit_text.clear()
+                            if ", " in edit_text.text:
+                                continue
+                            else:
+                                break
+                        edit_text.send_keys(word)
                 else:
                     continue
             except BaseException:
@@ -79,45 +84,64 @@ class MyTests():
         self.click_front_view()
         while True:
             try:
-                # if self.driver.find_elements_by_xpath("//android.view.View[contains(@text,'搜索')]"):
-                if self.is_element_exist('"搜索" class="android.view.View"'):
+                # if self.driver.find_element_by_xpath("//android.view.View[contains(@text,'搜索')]"):
+                if self.is_element_exist('"搜索"'):
                     self.set_word(word)
                 # elif self.driver.find_elements_by_xpath("//*[contains(@text,'人想要')]"):
-                elif self.is_element_exist('人想要" class="android.view.View"'):
+                elif self.is_element_exist('人想要"'):
                     # if self.driver.find_elements_by_xpath("//*[contains(@text,'没有找到你想要的')]"):
                     if self.is_element_exist('小闲鱼没有找到你想要的宝贝'):
                         self.driver.find_element_by_xpath("//*[@text='返回']").click()
                         self.driver.implicitly_wait(5)
                         continue
                     return True
+                elif self.is_element_exist("坐下来喝口水"):
+                    self.swipe_verify()
                 else:
                     pass
             except BaseException:
                 traceback.print_exc()
 
-    def click_sort(self):
-        try:
-            self.driver.find_element_by_xpath("//*[@text='已折叠, 综合']|//*[@text='已折叠, 最新发布']").click()
-            self.driver.implicitly_wait(10)
-        except BaseException:
-            traceback.print_exc()
-
     def refresh(self):
         num = 1
         while True:
             try:
-                self.click_sort()
+                if self.is_element_exist('已折叠, 最新发布') or self.is_element_exist('已折叠, 综合'):
+                    self.driver.find_element_by_xpath("//*[@text='已折叠, 综合']|//*[@text='已折叠, 最新发布']").click()
+                    self.driver.implicitly_wait(10)
                 # if self.driver.find_element_by_xpath("//*[@text='最新发布']"):
-                if self.is_element_exist('"最新发布" class="android.view.View"'):
+                if self.is_element_exist('"最新发布"'):
                     self.driver.find_element_by_xpath("//*[@text='最新发布']").click()
                     self.driver.implicitly_wait(10)
                     num += 1
                 elif self.is_element_exist("坐下来喝口水"):
                     print(f"次数：{num}")
+                    self.swipe_verify()
                     return False
             except BaseException:
                 traceback.print_exc()
-            time.sleep(random.uniform(2, 6))
+            # time.sleep(random.uniform(2, 6))
+
+    def swipe_verify(self):
+        try:
+            if self.is_element_exist("非常抱歉，这出错了"):
+                self.driver.find_element_by_xpath("//*[contains(@text,'刷新')]/..").click()
+            if self.is_element_exist("向右滑动验证"):
+                k = 0
+                start_but = self.driver.find_element_by_xpath("//*[@id='nc_1_n1t']|//*[@resource-id='nc_1_n1t']")
+                start_but_rect = start_but.rect
+                end_but = self.driver.find_element_by_xpath("//*[contains(@text,'向右滑动验证')]")
+                end_but_rect = end_but.rect
+                swipe_end = end_but_rect['x'] + end_but_rect['width']
+                tracks = self.generate_tracks(swipe_end)
+                action = TouchAction(self.driver)
+                # action.long_press(start_but, swipe_end, end_but_rect['y'], 3000)
+                for s in tracks:
+                    k += end_but_rect['x'] + s
+                    # self.driver.swipe(start_but_rect['x'] + random.uniform(10, start_but_rect['width']), start_but_rect['y'], k, end_but_rect['y'])
+                    action.move_to(start_but)
+        except BaseException:
+            pass
 
     # 测试结束后执行的方法
     def tearDown(self):
@@ -139,6 +163,29 @@ class MyTests():
             return True
         else:
             return False
+
+    def generate_tracks(self, S):
+        """
+        :param S: 缺口距离Px
+        :return:
+        """
+        S += 20
+        v = 0
+        t = 0.2
+        forward_tracks = []
+        current = 0
+        mid = S * 3 / 5  # 减速阀值
+        while current < S:
+            if current < mid:
+                a = 2  # 加速度为+2
+            else:
+                a = -3  # 加速度-3
+            s = v * t + 0.5 * a * (t ** 2)
+            v = v + a * t
+            current += s
+            forward_tracks.append(round(s))
+
+        return forward_tracks
 
 
 if __name__ == '__main__':
