@@ -32,7 +32,7 @@ class MyTests():
                              'skipDeviceInitialization': True,
                              'unicodeKeyboard': True,
                              'resetKeyboard': True,
-                             'udid': 'f5c6c341'
+                             # 'udid': 'f5c6c341'
                              }
         self.front_view_id = "com.taobao.idlefish:id/front_view"
         self.flutter_activity = "com.idlefish.flutterbridge.flutterboost.IdleFishFlutterActivity"
@@ -96,7 +96,8 @@ class MyTests():
                         continue
                     return True
                 elif self.is_element_exist("坐下来喝口水"):
-                    self.swipe_verify()
+                    # self.swipe_verify()
+                    return False
                 else:
                     pass
             except BaseException:
@@ -116,7 +117,7 @@ class MyTests():
                     num += 1
                 elif self.is_element_exist("坐下来喝口水"):
                     print(f"次数：{num}")
-                    self.swipe_verify()
+                    # self.swipe_verify()
                     return False
             except BaseException:
                 traceback.print_exc()
