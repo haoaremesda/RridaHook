@@ -38,3 +38,7 @@ self.driver.swipe(start_but_rect['x'] + random.uniform(10, start_but_rect['width
 
 self.driver.swipe(but.location['x'], but.location['y'], swipe_end, but.location['y'] + 10)
 self.driver.find_element_by_xpath("//android.view.View[contains(@text,'刷新')]")
+
+
+mitmweb -s main_appium/mitmp_idlefish.py
+
