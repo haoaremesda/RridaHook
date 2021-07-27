@@ -6,9 +6,6 @@ function showStacks() {
 
 function ttsz() {
     Java.perform(function () {
-        Java.openClassFile("data/local/tmp/gson-2.8.5.dex").load()
-        var Gson = Java.use("com.google.gson.Gson")
-        var gson = Gson.$new()
         var SwitchConfig = Java.use('mtopsdk.mtop.global.SwitchConfig');
         SwitchConfig.zJ.overload().implementation = function () {
             return false;

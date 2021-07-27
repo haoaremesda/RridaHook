@@ -7,8 +7,6 @@ colorama==0.4.4
 configobj==5.0.6
 delegator.py==0.1.1
 Flask==2.0.1
-frida==14.2.18
-frida-tools==9.2.5
 idna==2.10
 importlib-metadata==4.6.0
 itsdangerous==2.0.1
