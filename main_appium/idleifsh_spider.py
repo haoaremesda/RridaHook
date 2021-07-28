@@ -2,6 +2,7 @@ import os
 import random
 import subprocess
 import sys
+import threading
 import time
 import traceback
 
@@ -19,10 +20,14 @@ from hook_config import HookIdlefish
 
 idleifsh_ids_key = "idleifsh_ids"
 idleifsh_data_key = "idleifsh_data"
+
 RedisHost = "127.0.0.1"
 RedisPort = 6379
 DatadomeCookieRedisDb = 0
 pool = redis.ConnectionPool(host=RedisHost, port=RedisPort, db=DatadomeCookieRedisDb, decode_responses=True)
+r = redis.Redis(connection_pool=pool, decode_responses=True)
+lock = threading.Lock()
+
 
 def testing(func):
     def say(*args, **kwargs):
@@ -41,8 +46,8 @@ class IdlefishAppiumSpider():
         self.main_activity = 'com.taobao.fleamarket.home.activity.MainActivity'
         self.detail_activity = 'com.idlefish.flutterbridge.flutterboost.IdleFishFlutterActivity'
         self.desired_caps = {'platformName': 'Android',  # 平台名称
-                             'platformVersion': '7.0',  # 系统版本号
-                             'deviceName': '192.168.31.100:5555',  # 设备名称。如果是真机，在'设置->关于手机->设备名称'里查看
+                             'platformVersion': '11.0',  # 系统版本号
+                             'deviceName': '192.168.31.238:5555',  # 设备名称。如果是真机，在'设置->关于手机->设备名称'里查看
                              'appPackage': 'com.taobao.idlefish',  # apk的包名
                              # 'appPackage': 'com.qihoo.contents',  # apk的包名
                              'appActivity': self.init_activity,  # activity 名称
@@ -53,7 +58,8 @@ class IdlefishAppiumSpider():
                              'skipDeviceInitialization': True,
                              'unicodeKeyboard': True,
                              'resetKeyboard': True,
-                             'udid': '192.168.31.100:5555'
+                             'udid': '192.168.31.238:5555',
+                             'systemPort': 19990
                              }
         self.front_view_id = "com.taobao.idlefish:id/front_view"
         self.flutter_activity = "com.idlefish.flutterbridge.flutterboost.IdleFishFlutterActivity"
@@ -71,8 +77,8 @@ class IdlefishAppiumSpider():
                 # self.driver = webdriver.Remote(self.url, self.desired_caps)  # 连接Appium
                 self.driver = webdriver.Remote(self.url, self.desired_caps)
                 self.driver.wait_activity(self.main_activity, 10, 1)
-                # if self.start_hook():return True
-                if 1 == 1:return True
+                if self.start_hook():
+                    return True
                 else:
                     self.kill()
             except BaseException:
@@ -98,7 +104,8 @@ class IdlefishAppiumSpider():
                         self.driver.implicitly_wait(10)
                         self.driver.find_element_by_xpath(self.search_but_xpath).click()
                         return True
-                    elif self.is_element_exist('"粘贴" class="android.widget.Button"'):
+                    elif self.is_element_exist('"粘贴" class="android.widget.Button"') or self.is_element_exist(
+                            '"android.widget.Button" text="粘贴"'):
                         self.driver.find_element_by_xpath("//android.widget.Button[@text='粘贴']").click()
                     else:
                         while True:
@@ -126,10 +133,11 @@ class IdlefishAppiumSpider():
                 # if self.driver.find_element_by_xpath("//android.view.View[contains(@text,'搜索')]"):
                 if self.is_element_exist(self.front_view_id):
                     self.click_front_view()
-                elif self.is_element_exist('"搜索" class="android.view.View"'):
+                elif self.is_element_exist('"搜索" class="android.view.View"') or self.is_element_exist(
+                        '"android.view.View" text="搜索"'):
                     self.set_word(word)
                 # elif self.driver.find_elements_by_xpath("//*[contains(@text,'人想要')]"):
-                elif self.is_element_exist('"最新发布"'):
+                elif self.is_element_exist('"最新发布"') or self.is_element_exist('已折叠, 综合'):
                     # if self.driver.find_elements_by_xpath("//*[contains(@text,'没有找到你想要的')]"):
                     if self.is_element_exist('小闲鱼没有找到你想要的宝贝'):
                         self.driver.implicitly_wait(5)
@@ -227,38 +235,41 @@ class IdlefishAppiumSpider():
             return False
 
     def goto_detail(self):
-        ids = self.r.smembers(idleifsh_ids_key)
-        for id in ids:
-            url = f"https://market.m.taobao.com/app/idleFish-F2e/widle-taobao-rax/page-detail?wh_weex=true&wx_navbar_transparent=true&id={id}"
+        while True:
+            lock.acquire()
+            try:
+                ids = r.spop(idleifsh_ids_key)
+                if not ids:
+                    time.sleep(5)
+                    continue
+            except:
+                traceback.print_exc()
+                continue
+            finally:
+                lock.release()
+            url = f"https://market.m.taobao.com/app/idleFish-F2e/widle-taobao-rax/page-detail?wh_weex=true&wx_navbar_transparent=true&id={ids}"
             self.goto_good_details(url)
-            time.sleep(1)
-        self.r.delete(idleifsh_ids_key)
-        # self.r.delete(idleifsh_data_key)
+            time.sleep(0.5)
 
     def goto_good_details(self, url):
-        device_model = self.driver.session["deviceModel"]
         while True:
             try:
-                if device_model == "SM-G9550":
-                    self.driver.start_activity("com.oupeng.mini.android", "com.opera.android.OperaMainActivity")
-                    self.driver.find_element_by_id("com.sec.android.app.sbrowser:id/location_bar_edit_text").click()
-                    url_bar = self.driver.find_element_by_id("com.sec.android.app.sbrowser:id/location_bar_edit_text")
-                    url_bar.clear()
-                    url_bar.send_keys(url)
-                    self.driver.find_element_by_id("com.android.browser:id/toolbar_goto_textview").click()
-                    self.driver.wait_activity(self.detail_activity, 10, 1)
-                    if self.driver.current_activity == self.detail_activity:
-                        break
+                if self.is_element_exist("快速打开复制的网址"):
+                    self.driver.find_element_by_xpath("//android.widget.TextView[@text='打开']").click()
+                    num = 10
+                    while num:
+                        if self.is_element_exist("页面尝试打开外部程序"):
+                            self.driver.find_element_by_xpath("//android.widget.Button[@text='打开']").click()
+                            self.driver.wait_activity(self.detail_activity, 10, 1)
+                        elif self.driver.current_activity == self.detail_activity and self.is_element_exist('"android.view.View" text="我想要"'):
+                            break
+                        time.sleep(1)
+                        num -= 1
                 else:
-                    self.driver.start_activity("com.android.browser", ".MainActivity")
-                    self.driver.find_element_by_id("com.android.browser:id/home_bg_address_bar_title").click()
-                    url_bar = self.driver.find_element_by_id("com.android.browser:id/url_bar")
-                    url_bar.clear()
-                    url_bar.send_keys(url)
-                    self.driver.find_element_by_id("com.android.browser:id/toolbar_goto_textview").click()
-                    self.driver.wait_activity(self.detail_activity, 10, 1)
-                    if self.driver.current_activity == self.detail_activity:
-                        break
+                    self.driver.set_clipboard_text(url)
+                    self.driver.start_activity("com.ijinshan.browser_fast",
+                                               "com.ijinshan.browser.screen.BrowserActivity")
+                    self.driver.wait_activity("com.ijinshan.browser.screen.BrowserActivity", 10, 1)
             except BaseException:
                 traceback.print_exc()
 
@@ -276,7 +287,7 @@ class IdlefishAppiumSpider():
             }})
             """
             try:
-                str_host = '192.168.31.17:6666'
+                str_host = '192.168.31.238:6666'
                 manager = frida.get_device_manager()
                 remote_device = manager.add_remote_device(str_host)
                 session = remote_device.attach("com.taobao.idlefish")
@@ -287,7 +298,8 @@ class IdlefishAppiumSpider():
                 traceback.print_exc()
 
     def start_mitmp(self):
-        popens = subprocess.Popen(['mitmdump', '-p', f'{self.port+1}', '-s', f'{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/main_appium/mitmp_idlefish.py'],
+        popens = subprocess.Popen(['mitmdump', '-p', f'{self.port + 1}', '-s',
+                                   f'{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}/main_appium/mitmp_idlefish.py'],
                                   stdin=subprocess.PIPE, stderr=sys.stderr, close_fds=True,
                                   stdout=sys.stdout, universal_newlines=True, shell=True, bufsize=1)
         print(f"start_mitmp：{popens.pid}")
@@ -329,8 +341,9 @@ if __name__ == '__main__':
     spider = IdlefishAppiumSpider("手机")
     if spider.start_driver():
         print(1)
-        if spider.search(spider.word):
-            print(2)
-            spider.refresh()
-            print(4)
+        spider.goto_detail()
+        # if spider.search(spider.word):
+        #     print(2)
+        #     spider.refresh()
+        #     print(4)
     print(spider.driver.get_window_size())
